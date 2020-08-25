@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+</style>
+
+</head>
+
+<body>
+
+<select name="environment" id="userInput00"> <!-- allows the user to select the environment-->
+		<option value="Test" selected>Test</option>
+        <option value="Live">Live</option>
+</select><br />	
+
+
+<input type="text" id="userInput01" placeholder="Installation Id" ></input>
+<div class="tooltip" style="color: red"> More info
+  <span class="tooltiptext">This is a number that is account specific. You can find in your merchant interface <a href="https://secure.worldpay.com/sso/public/auth/login.html?serviceIdentifier=merchantadmin&maiversion=version2/" style="color: white"target="_blank" >Worldpay business manager<a/></span>
+</div><br />
+
+<p>Please select your type of agreement you wish to create for your recurring payments</p>
+
+<select id="test" name="form_select" onchange="showDiv(this)">
+   <option value="0" select>Regular</option>
+   <option value="1">Limited</option>
+   <option value="2">Custom</option>
+</select>
+
+<div id="hidden_div1" style="display:show;">
+<br />
+<select name="regularagreements" id="userInput1">
+        <option value="Inittim" selected>Initial + Timed Payments</option>
+        <option value="Delaytim">Delayed Timed Payments</option>
+        <option value="Firstdiff">First Payment is Different</option>
+        <option value="Adjpay">Adjustable Payment Amounts</option>
+        <option value="Adjdate">Adjustable Start Date</option>
+</select><br />
+
+<p>Please click button to generate code</p>
+<button onclick="myFunctionreg()">Generate</button>
+<p id="demoreg"></p>
+
+</div>
+
+<div id="hidden_div2" style="display:none;">
+<br />
+<select name="limitedagreements" id="userInput2">
+        <option value="Unlimpay" selected>Unlimited Payments</option>
+        <option value="Restripay">Restricted Unlimited Payments</option>
+        <option value="Timepay">Timeboxed Daily Payments</option>
+        <option value="Totalrestri">Total Amount Restriction</option>
+        <option value="Delaystar">Delayed Start</option>
+</select><br />
+
+<p>Please click button to generate code</p>
+<button onclick="myFunctionlim()">Generate</button>
+<p id="demolim"></p>
+
+</div>
+
+<div id="hidden_div3" style="display:none;">
+<br />
+<select id="userInput3" name="form_selectagree">
+   <option value="regular" select>regular</option>
+   <option value="limited">limited</option>
+</select> FuturePayType (choose between regular agreements and limited agreements)<br />
+<input type="text" id="userInput4" placeholder="Select Option"></input><div class="tooltip" style="color: red"> More info
+  <span class="tooltiptext">input values between the numbers 0, 1 and 2
+</div><br />
+
+<input type="text" id="userInput5" placeholder="Start date"></input><div class="tooltip" style="color: red"> More info
+  <span class="tooltiptext">This is a number that is account specific. You can find in your merchant interface
+</div><br />
+
+<input type="text" id="userInput6" placeholder="End Date"></input><br />
+
+<input type="text" id="userInput7" placeholder="Start Delay Unit"> Start Delay unit (please input one number: 1-day, 2-week, 3-month, 4-year)</input><br />
+
+<input type="text" id="userInput8" placeholder="Start Delay Mult"> Start Delay mult</input><br />
+
+<input type="text" id="userInput9" placeholder="Number of Payments"> No Of Payments (Positive number. Set to 0 for unlimited.)</input><br />
+
+<input type="text" id="userInput10" placeholder="Interval Unit" Interval unit (please input one number: 1-day, 2-week, 3-month, 4-year)</input><br />
+
+<input type="text" id="userInput11" placeholder="Inerval Mult"> Interval mult</input><br />
+
+<input type="text" id="userInput12" placeholder="Initial Amount"> Initial amount</input><br />
+
+<input type="text" id="userInput13" placeholder="Normal Amount"> Normal amount</input><br />
+
+
+<p>Please click button to generate code (note: incorrect values may break the integration)</p>
+<button onclick="myFunctioncust()">Generate</button>
+<p id="democust"></p>
+
+</div>
+
+
+<script type="text/javascript">
+function showDiv(select){
+//this will let you choose the option of the type of agreement by showing the option that was selected and hiding the others
+   if(select.value==0){
+    document.getElementById('hidden_div1').style.display = "block";
+   } else{
+    document.getElementById('hidden_div1').style.display = "none";
+   }
+   if(select.value==1){
+    document.getElementById('hidden_div2').style.display = "block";
+   } else{
+    document.getElementById('hidden_div2').style.display = "none";
+   }
+   if(select.value==2){
+    document.getElementById('hidden_div3').style.display = "block";
+   } else{
+    document.getElementById('hidden_div3').style.display = "none";
+   }
+}
+
+function myFunctionreg() {
+//this is the function for the regular agreements
+	var ENV = document.getElementById("userInput00").value; //variable for the environment
+    var Environment; //contains the url for test or live
+	var TMode; //defines the value of variable testMode -0 or 100
+    if (ENV === "Test") {
+        Environment = "https://secure-test.worldpay.com/wcc/purchase";
+		TMode = 100;
+    } else {
+        Environment = "https://secure.worldpay.com/wcc/purchase";
+		TMode = 0;
+    }
+
+
+    var x = document.getElementById("userInput01").value; //captures the value of the user input
+	var regulardeci = document.getElementById("userInput1").value;
+	
+    if (regulardeci === "Inittim") {
+		    document.getElementById("demoreg").innerHTML = 
+	"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "regular" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 0 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDelayUnit&quot; value=&quot;" + 2 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDelayMult&quot; value=&quot;"+ 1 + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 5 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 2 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;initialAmount&quot; value=&quot;" + 13.99 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;normalAmount&quot; value=&quot;" + 17.99 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci === "Delaytim") {
+				    document.getElementById("demoreg").innerHTML = 
+					"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "regular" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 1 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDate&quot; value=&quot;" + 2 + "&quot;/&gt;"+ "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 2 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;normalAmount&quot; value=&quot;" + 17.99 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci === "Firstdiff") {
+		document.getElementById("demoreg").innerHTML = 
+		"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "regular" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 0 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDelayUnit&quot; value=&quot;" + 3 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDelayMult&quot; value=&quot;"+ 1 + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 12 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 3 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;initialAmount&quot; value=&quot;" + 9.99 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;normalAmount&quot; value=&quot;" + 99.99 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci === "Adjpay") {
+		document.getElementById("demoreg").innerHTML = 
+		"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "regular" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 1 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDelayUnit&quot; value=&quot;" + 3 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;startDelayMult&quot; value=&quot;"+ 1 + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 4 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 3 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;normalAmount&quot; value=&quot;" + 9.99 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci === "Adjdate") {
+				document.getElementById("demoreg").innerHTML = 
+				"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "regular" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 2 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 5 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 2 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 3 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    }
+}
+
+function myFunctionlim() {
+//this function is for the limited agreements
+	var ENV = document.getElementById("userInput00").value; //variable for the environment
+    var Environment; //contains the url for test or live
+	var TMode; //defines the value of variable testMode -0 or 100
+    if (ENV === "Test") {
+        Environment = "https://secure-test.worldpay.com/wcc/purchase";
+		TMode = 100;
+    } else {
+        Environment = "https://secure.worldpay.com/wcc/purchase";
+		TMode = 0;
+    }
+
+
+    var x = document.getElementById("userInput01").value; //captures the value of the user input
+	var regulardeci2 = document.getElementById("userInput2").value;
+	
+	if (regulardeci2 === "Unlimpay") {
+		    document.getElementById("demolim").innerHTML = 
+			"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "limited" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 0 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci2 === "Restripay") {
+				    document.getElementById("demolim").innerHTML = 
+					"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "limited" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 0 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;amountLimit&quot; value=&quot;" + 150.00 + "&quot;/&gt;"+ "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;startDelayUnit&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;startDelayMult&quot; value=&quot;" + 3 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 5 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci2 === "Timepay") {
+		document.getElementById("demolim").innerHTML = 
+		"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "limited" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 1 + "&quot;/&gt;"+ "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;amountLimit&quot; value=&quot;" + 10.00 + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;lengthUnit&quot; value=&quot;" + 2 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;lengthMult&quot; value=&quot;" + 4 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci2 === "Totalrestri") {
+		document.getElementById("demolim").innerHTML = 
+		"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "limited" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 2 + "&quot;/&gt;"+ "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;amountLimit&quot; value=&quot;" + 150.00 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    } else if (regulardeci2 === "Delaystar") {
+				document.getElementById("demolim").innerHTML = 
+				"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" + 
+    "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + "limited" + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + 3 + "&quot;/&gt;"+ "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;amountLimit&quot; value=&quot;" + 15.00 + "&quot;/&gt;"+ "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;startDelayUnit&quot; value=&quot;" + 2 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;startDelayMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + 0 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + 1 + "&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;";
+    }
+}
+function myFunctioncust() {
+//variables are used as: 1.obtain the input, 2.test if necessary, 3.the value to be shown
+	var ENV = document.getElementById("userInput00").value; //variable for the environment
+    var Environment; //contains the url for test or live
+	var TMode; //defines the value of variable testMode -0 or 100
+    if (ENV === "Test") {
+        Environment = "https://secure-test.worldpay.com/wcc/purchase";
+		TMode = 100;
+    } else {
+        Environment = "https://secure.worldpay.com/wcc/purchase";
+		TMode = 0;
+    }
+
+
+    var x = document.getElementById("userInput01").value; //captures the value of the user input
+	var fttype = document.getElementById("userInput3").value;
+	var ftfinal;
+	
+    var Optionno = document.getElementById("userInput4").value;
+	var Optionfinal;
+	
+	var startdate = document.getElementById("userInput5").value;
+	var testdatest = new Date(document.getElementById("userInput5").value); //allows to test if the value inputted is actually a date
+	var startdfinal;
+	
+	var enddate = document.getElementById("userInput6").value;
+	var testdateend = new Date(document.getElementById("userInput6").value); //allows to test if the value inputted is actually a date
+	var enddfinal;
+	
+	var startunitdel = document.getElementById("userInput7").value;
+	var unitdelfinal;
+	
+	var startmultdel = document.getElementById("userInput8").value;
+	var multdelfinal;
+	
+	var nopaym = document.getElementById("userInput9").value;
+	var nopaymfinal;
+	
+	var interunit = document.getElementById("userInput10").value;
+	var interunfinal;
+	
+	var intermult = document.getElementById("userInput11").value;
+	var intermultfinal;
+	
+	var initamoun = document.getElementById("userInput12").value;
+	var initamounfinal;
+	
+	var normamoun = document.getElementById("userInput13").value;
+	var normamounfinal;
+	
+	if (fttype == "regular" || fttype == "limited") {
+		ftfinal = "&lt;input type=&quot;hidden&quot; name=&quot;futurePayType&quot; value=&quot;" + fttype + "&quot;/&gt;" + "<br />";
+    } else if (fttype !== null && fttype === ""){
+        ftfinal = "";
+    }
+	if (Optionno == "0" || Optionno == "1" || Optionno == "2") {
+		Optionfinal = "&lt;input type=&quot;hidden&quot; name=&quot;option&quot; value=&quot;" + Optionno + "&quot;/&gt;" + "<br />";
+    } else if (Optionno !== null && Optionno === ""){
+        Optionfinal = "";
+    }
+	if (! isNaN ( testdatest.getMonth() )) {
+		startdfinal = "&lt;input type=&quot;hidden&quot; name=&quot;startDate&quot; value=&quot;" + startdate + "&quot;/&gt;" + "<br />";
+    } else if (startdate !== null && startdate === ""){
+        startdfinal = "";
+    }
+	if (! isNaN ( testdateend.getMonth() )) {
+		enddfinal = "&lt;input type=&quot;hidden&quot; name=&quot;endDate&quot; value=&quot;" + enddate + "&quot;/&gt;" + "<br />";
+    } else if (enddate !== null && enddate === ""){
+        enddfinal = "";
+    }
+	if (startunitdel == "0" || startunitdel == "1" || startunitdel == "2" || startunitdel == "3" || startunitdel == "4") {
+		unitdelfinal = "&lt;input type=&quot;hidden&quot; name=&quot;startDelayUnit&quot; value=&quot;" + startunitdel + "&quot;/&gt;" + "<br />";
+    } else if (startunitdel !== null && startunitdel === ""){
+        unitdelfinal = "";
+    }
+	if (startmultdel >= "1" ) {
+		multdelfinal = "&lt;input type=&quot;hidden&quot; name=&quot;startDelayMult&quot; value=&quot;" + startmultdel + "&quot;/&gt;" + "<br />";
+    } else if (startmultdel !== null && startmultdel === ""){
+        multdelfinal = "";
+    }
+	if (nopaym >= "0" ) {
+		nopaymfinal = "&lt;input type=&quot;hidden&quot; name=&quot;noOfPayments&quot; value=&quot;" + nopaym + "&quot;/&gt;" + "<br />";
+    } else if (nopaym !== null && nopaym === ""){
+        nopaymfinal = "";
+    }
+	if (interunit == "0" || interunit == "1" || interunit == "2" || interunit == "3" || interunit == "4") {
+		interunfinal = "&lt;input type=&quot;hidden&quot; name=&quot;intervalUnit&quot; value=&quot;" + interunit + "&quot;/&gt;" + "<br />";
+    } else if (interunit !== null && interunit === ""){
+        interunfinal = "";
+    }
+	if (intermult >= "1" ) {
+		intermultfinal = "&lt;input type=&quot;hidden&quot; name=&quot;intervalMult&quot; value=&quot;" + intermult + "&quot;/&gt;" + "<br />";
+    } else if (intermult !== null && intermult === ""){
+        intermultfinal = "";
+    }
+	if (initamoun > "0" ) {
+		initamounfinal = "&lt;input type=&quot;hidden&quot; name=&quot;initialAmount&quot; value=&quot;" + initamoun + "&quot;/&gt;" + "<br />";
+    } else if (initamoun !== null && initamoun === ""){
+        initamounfinal = "";
+    }
+	if (normamoun > "0" ) {
+		normamounfinal = "&lt;input type=&quot;hidden&quot; name=&quot;normalAmount&quot; value=&quot;" + normamoun + "&quot;/&gt;" + "<br />";
+    } else if (normamoun !== null && normamoun === ""){
+        normamounfinal = "";
+    }
+	
+	document.getElementById("democust").innerHTML = 
+	"&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" +
+	ftfinal + Optionfinal + startdfinal + enddfinal + unitdelfinal + multdelfinal + nopaymfinal + interunfinal + intermultfinal + initamounfinal + normamounfinal + "<br />" +
+    "&lt;/form&gt;";
+	
+}
+
+</script>
+
+</body>
+</html>
