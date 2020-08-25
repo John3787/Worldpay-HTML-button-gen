@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<!-- <a href=https://secure.worldpay.com/sso/public/auth/login.html?serviceIdentifier=merchantadmin&maiversion=version2/>-->
+<style>
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+</style>
+<script>
+</script>
+<body>
+
+<select name="environment" id="userInput0" id="sel_activity" onchange="selectionChange(this)" > <!-- allows the user to select the environment-->
+		<option value="Test" selected >Test</option>
+        <option value="Before you can take live payments the installation will need to be set live by the activation team by calling 0208 185 0606 Opt 2|Live" >Live</option>
+</select><br />		
+<input type="text" id="userInput1"  placeholder="Installation Id"></input><div class="tooltip" style="color: red"> More info
+  <span class="tooltiptext">This is a number that is account specific. You can find in your merchant interface <a href="https://secure.worldpay.com/sso/public/auth/login.html?serviceIdentifier=merchantadmin&maiversion=version2/" style="color: white"target="_blank" >Worldpay business manager<a/></span>
+</div><br /> <!-- allows the user to input the value of installation ID-->
+<input type="text" id="userInput2"=  placeholder="Cart Id"></input><div class="tooltip"style="color: red">More info
+  <span class="tooltiptext">The cart Id is the product refrence from your website. </span>
+</div><br /> <!-- this is for the Cart ID-->
+<select name="currency" id="userInput3"> <!-- option for the currency-->
+        <option value="ARS">ARS - Nuevo Argentine Peso</option>
+        <option value="AUD">AUD - Australian Dollar</option>
+        <option value="BRL">BRL - Brazilian Real</option>
+        <option value="CAD">CAD - Canadian Dollar</option>
+        <option value="CHF">CHF - Swiss Franc</option>
+        <option value="CLP">CLP - Chilean Peso</option>
+        <option value="CNY">CNY - Yuan Renminbi</option>
+        <option value="COP">COP - Colombian Peso</option>
+        <option value="CZK">CZK - Czech Koruna</option>
+        <option value="DKK">DKK - Danish Krone</option>
+        <option value="EUR">EUR - Euro</option>
+        <option value="GBP" selected="">GBP - Pound Sterling</option>
+        <option value="HKD">HKD - Hong Kong Dollar</option>
+        <option value="HUF">HUF - Hungarian Forint</option>
+        <option value="IDR">IDR - Indonesian Rupiah</option>
+        <option value="JPY">JPY - Japanese Yen</option>
+        <option value="KES">KES - Kenyan Shilling</option>
+        <option value="KRW">KRW - South-Korean Won</option>
+        <option value="MXP">MXP - Mexican Peso</option>
+        <option value="MYR">MYR - Malaysian Ringgit</option>
+        <option value="NOK">NOK - Norwegian Krone</option>
+        <option value="NZD">NZD - New Zealand Dollar</option>
+        <option value="PHP">PHP - Phillipine Peso</option>	
+        <option value="PLN">PLN - New Polish Zloty</option>									
+        <option value="PTE">PTE - Portugese Escudo</option>									
+        <option value="SEK">SEK - Swedish Krone</option>																				
+        <option value="SGD">SGD - Singapore Dollar</option>							
+        <option value="SKK">SKK - Slovak Koruna</option>				
+        <option value="THB">THB - Thai Baht</option>
+		<option value="TWD">TWD - New Taiwan Dollar</option>
+		<option value="USD">USD - US Dollars</option>								
+        <option value="VND">VND - Vietnamese New Dong</option>							
+        <option value="ZAR">ZAR - South African Rand</option>
+</select><br />
+<input type="text" id="userInput4"=  placeholder="Transaction Value"></input><div class="tooltip" style="color: red">More info
+  <span class="tooltiptext">The amount that you wish to charge. If this is over £5000 you will need to get the maximum transaction limit raised. This can be done by calling the customer services on 0208 185 0606 Opt 6</span>
+</div>
+
+<p>Please click button to generate code</p>
+
+<button onclick="myFunction()">Generate</button> <div class="tooltip"style="color: red">More Info
+  <span class="tooltiptext">This will genrate a HTML form code that you can copy and add to the setup of your website.</span>
+</div><!-- call the function below-->
+
+<p id="demo"></p> <!-- output of the function after it is finished-->
+<script>
+
+ function selectionChange(o) {
+   // an alternative ...    
+   var values = o.options[o.options.selectedIndex].value.split("|");            
+   alert(+(o.options.selectedIndex+1)
+    +"\nInfo? "+values[0]);
+   values = null;
+  }
+
+function myFunction() {
+	var ENV = document.getElementById("userInput0").value; //variable for the environment
+    var Environment; //contains the url for test or live
+	var TMode; //defines the value of variable testMode -0 or 100
+    if (ENV === "Test") {
+        Environment = "https://secure-test.worldpay.com/wcc/purchase";
+		TMode = 100;
+    } else {
+        Environment = "https://secure.worldpay.com/wcc/purchase";
+		TMode = 0;
+    }
+
+
+    var x = document.getElementById("userInput1").value; //captures the value of the user input
+    var y = document.getElementById("userInput2").value;
+	var z = document.getElementById("userInput3").value;
+    var zy = document.getElementById("userInput4").value;
+    
+    document.getElementById("demo").innerHTML = 
+    "&lt;form action=&quot;" + Environment + "&quot; name=&quot;BuyForm&quot; method=&quot;POST&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;testMode&quot; value=&quot;" + TMode + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;instId&quot; value=&quot;" + x + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;cartId&quot; value=&quot;" + y + "&quot;/&gt;"+ "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;currency&quot; value=&quot;"+ z + "&quot;/&gt;" + "<br />" +
+    "&lt;input type=&quot;hidden&quot; name=&quot;amount&quot; value=&quot;" + zy + "&quot;/&gt;" + "<br />" +
+	"&lt;input type=&quot;submit&quot; value=&quot;Submit Form&quot;/&gt;" + "<br />" +
+    "&lt;/form&gt;"; //innerhtml will output the code above in the demo after the button is pressed
+
+}
+</script>
+
+</body>
+</html>
